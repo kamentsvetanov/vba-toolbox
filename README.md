@@ -1,9 +1,24 @@
-## Commonality Analysis for Neuroimaging
+## Voxel-Based Analysis Toolbox: GLM, Mixed-Effects, and Commonality Analysis for Neuroimagin
 
-Commonality analysis for neuroimaging. Code supporting Wu et al, "Cerebral blood flow predicts multiple demand network activity and fluid intelligence across the lifespan".
+A flexible MATLAB toolbox for voxel-wise statistical analysis, supporting GLM, mixed-effects models, and commonality analysis across multi-modal brain images.
 
 ### Background
-This voxel-wise GLM-like approach uses MATLAB's fitlm to save nii image of coefficients and p-values for each variable and residuals. This could be useful in instances with voxel-specific covariates. For example, in [Tsvetanov et al 2020](https://doi.org/10.1111/psyp.13714), we estimated variance explained and residuals in RSFA maps (across subjects) after controlling for regionally-speciffic effects of ASL maps, T1w maps in addition to other systemic effects.
+
+This toolbox extends the original commonality analysis approach for neuroimaging, now providing a flexible framework for voxel-wise statistical analyses. Originally developed to support Wu et al., "Cerebral blood flow predicts multiple demand network activity and fluid intelligence across the lifespan", the toolbox now supports:
+
+- General Linear Models (GLM) for voxel-wise regression analyses
+- Mixed-effects models for hierarchical or repeated-measures designs
+- Commonality analysis to decompose variance explained by multiple predictors
+
+The toolbox works on multi-modal brain images, including ASL, T1w, and functional data. Like the original version, it leverages MATLAB’s fitlm and fitlme functions to compute voxel-wise coefficients, p-values, and residuals, enabling researchers to model both voxel-specific covariates and complex experimental designs.
+
+### User case examples:
+
+- Estimating variance explained by regional and systemic effects in RSFA maps (Tsvetanov et al., 2020)
+- Analyzing multi-modal imaging data across subjects and sessions
+- Performing advanced voxel-level decomposition of predictor contributions
+
+This new version is designed as a general-purpose, flexible voxel-based analysis toolbox, retaining the original capabilities while supporting a wider range of statistical modeling.
 
 We extended this voxel-wise approach to commonality analysis in [Wu et al 2022](https://www.sciencedirect.com/science/article/pii/S0197458022002044).
 
