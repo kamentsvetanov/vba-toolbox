@@ -14,7 +14,7 @@ The toolbox works on multi-modal brain images, including ASL, T1w, and functiona
 
 ### User case examples:
 
-- Estimating variance explained by regional and systemic effects in RSFA maps (Tsvetanov et al., 2020)
+- Estimating variance explained by regional and systemic effects in RSFA maps [Tsvetanov et al., 2021](https://onlinelibrary.wiley.com/doi/full/10.1111/psyp.13714)
 - Analyzing multi-modal imaging data across subjects and sessions
 - Performing advanced voxel-level decomposition of predictor contributions
 
