@@ -38,7 +38,6 @@
 % .../mat/spm12
 % and need to be loaded in Matlab's path
 % 
-kat_git_commands
 
 addpath(genpath('/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771'));
 addpath(genpath('/rds/user/kat35/hpc-work/projects/public-code/vba-toolbox/code'));
@@ -51,7 +50,7 @@ load(fullfile(datadir,'subject_info.mat'));
 
 % Update rsfa filepaths with the local environemnt
 T.f_rsfa = regexprep(T.f_rsfa,'/home/kt03/Projects/public-code/CommonalityAnalysis/data/rsfa',datadir);
-Model = 'f_rsfa ~ Age + Sex';
+Model = 'f_rsfa ~ Age + c_Sex';
 
 % -------------------------------------------------
 % Assemble cfg structure needed to run the analysis

@@ -77,30 +77,16 @@ function [cfg,outDir] = vba_run(T,cfg)
 % try specificSeed    = cfg.specificSeed;     catch specificSeed    = []; end % (SLURM option) provide specificSeed to reproduce permuted Matrix across workers/nodes
 % try doLogTrans      = cfg.doLogTrans;       catch doLogTrans    = 0;    end % Whether or not to log-transform neuroimaging data
 
-% -------------------------------------------------------------------------
-% 1. Validate and fill defaults ? single source of truth
+
+
 cfg = vba_cfg(cfg);   % populate defaults and validate
 
-% -------------------------------------------------------------------------
-% 2. Unpack for readability and parfor safety
-% Scalars and strings only ? large arrays stay in cfg
-% and are passed explicitly to subfunctions that need them
-rootDir          = cfg.rootDir;
-doZscore         = cfg.doZscore;
-doLogTrans       = cfg.doLogTrans;
-doRobust         = cfg.doRobust;
-doRunInSerial    = cfg.doRunInSerial;
-numPerm          = cfg.numPerm;
-startPerm        = cfg.startPerm;
-Model            = cfg.model;
-modelType        = cfg.modelType;% This can be 'linear', 'mixed' or 'commonality' or 'maineffect'
-specificSeed     = cfg.specificSeed;
-whichRandOrder   = cfg.whichRandOrder;
-f_mask           = cfg.f_mask;
 
 
 
-% -------------------------------------------------------------------------
+modelType = cfg.modelType;% This can be 'linear', 'mixed' or 'commonality' or 'maineffect'
+
+
 % Set parforArg to inf (Default), assuming CA is run in matlab with parfor.
 % Otherwise set to 0 (see example with SLURM implementation below)
 parforArg = Inf;
@@ -109,9 +95,9 @@ if doRunInSerial % Flag Paraller processing
 end
 
 
-% modeltype       = 'regression'; % 'one-sample' also possible if 'y~1'
+modeltype       = 'regression'; % 'one-sample' also possible if 'y~1'
 idxNumeric      = vartype('numeric'); 
-% idxCategorical  = vartype('categorical'); 
+idxCategorical  = vartype('categorical'); 
 
 % -------------------------
 % Get Variable names

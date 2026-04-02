@@ -9,7 +9,7 @@
 #SBATCH -o vba_analysis_slurm.out
 #SBATCH -e vba_analysis_slurm.err
 #! set array number
-#SBATCH --array=1-200 # Set to match num_permutations below
+#SBATCH --array=1-3 # Set to match num_permutations below
 
 #! Estimated maximum memory needed (job is force-stopped if exceeded):
 #! RAM is allocated in 3420mb blocks, you are charged per block used,
@@ -27,15 +27,17 @@
 # CONFIGURATION
 # =============================================================================
 
-num_permutations=200       # Must match --array upper bound above
+num_permutations=3     # Must match --array upper bound above
 
 random_seed=12345 # Define a consistent random seed. This is critical to ensure reproducible permutation matrix across nodes/tasks.
 
 column_index=$SLURM_ARRAY_TASK_ID
 
+modelType="commonality" # commonality | linear | mixed | maineffect
+
 # Wilkinson notation model: response ~ predictor1 + predictor2 + ...
 # Variable names must match column headers in subject_info.xlsx exactly
-Model="f_rsfa ~ age + c_sex" # Set model using Wilkinson Notation and variables names in database(refer to CommonalityAnalysis toolbox for more information)
+Model="f_rsfa ~ age + sex" # Set model using Wilkinson Notation and variables names in database(refer to CommonalityAnalysis toolbox for more information)
 
 
 # =============================================================================
@@ -54,7 +56,7 @@ module load matlab spm
 script_dir=$(dirname "$(realpath "$0")") # Get the directory of the currently executed script. # Path to the MATLAB script. Assuming the currently exectued sh script is in the same directory
 export PATH=$script_dir:$PATH #! Add MATLAB script path to the PATH environment variable
 
-vba_dir="/rds/user/kat35/hpc-work/projects/public-code/CommonalityAnalysis/code/"
+vba_dir="/rds/user/kat35/hpc-work/projects/public-code/vba-toolbox/code/"
 export PATH=$vba_dir:$PATH #! Add MATLAB script path to the PATH environment variable
 
 spm_dir="/home/kat35/rds/hpc-work/projects/external/mat/spm12_7771/"
@@ -74,4 +76,4 @@ echo "Model:                  $Model"
 # =============================================================================
 
 matlab -nodisplay -nosplash -r \
-    "addpath(genpath('${vba_dir}'));addpath(genpath('${spm_dir}')); vba_run_slurm('$f_data','$Model','$outDir',$num_permutations, $random_seed,$column_index,'$f_mask'); quit"
+    "addpath(genpath('${vba_dir}'));addpath(genpath('${spm_dir}')); vba_run_slurm('$f_data','$Model','$modelType','$outDir',$num_permutations, $random_seed,$column_index,'$f_mask'); quit"

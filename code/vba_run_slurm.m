@@ -1,4 +1,4 @@
-function vba_run_slurm(f_data, Model,rootDir,num_perm, specific_seed,column_index,f_mask)
+function vba_run_slurm(f_data, Model,modelType, rootDir,num_perm, specific_seed,column_index,f_mask)
 % Code showing the use of Voxel-based Analysis (VBA) with fitlm and 
 % commonality function using SLURM. 
 % Call this script with input variables using other environment (e.g. bash)
@@ -78,13 +78,13 @@ cfg                 = [];
 cfg.model           = Model;
 cfg.rootDir          = rootDir;%'/rds/project/rds-tbdABxTZvic/genfi_cvr/analysis/vba/temp'; 
 cfg.f_mask          = f_mask;%fullfile(datadir,'mask.nii');
-cfg.doCommonality   = 0;
 % cfg.doRobust        = 1;
 cfg.numPerm         = num_perm;
 % cfg.predefRandOrder = permMatrix;
 cfg.whichRandOrder  = column_index;
 cfg.specificSeed    = specific_seed;
 cfg.doSlurm         = 1;
+cfg.modelType       = modelType;% 'commonality' 'linear' 'mixed' 'maineffect' 
 cfg
 cfg                 = vba_run(T,cfg);
 

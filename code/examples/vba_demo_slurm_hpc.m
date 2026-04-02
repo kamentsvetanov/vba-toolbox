@@ -26,7 +26,7 @@ cfg.tfce.path2data  = cfg.outDir;
 cfg.tfce.typeStats  = 'tval'; 
 cfg.tfce.Ns         = size(cfg.tbl,1);
 cfg.tfce.Np         = size(cfg.tbl,2)-1;
-cfg.tfce.th         = 1.97;
+cfg.tfce.th         = 1.5;
 cfg.tfce.doRunInSerial = 1;
 cfg                 = vba_tfce_threshold(cfg);
 
@@ -34,7 +34,7 @@ cfg                 = vba_tfce_threshold(cfg);
 %% ------------------------------------------------------------------------
 % 4. Extract information for significant TFCE clusters in a results Table 
 % -------------------------------------------------------------------------
-prefix      = 'tfce197'; % Number defined in cfg.tfce.th
+prefix      = 'tfce150'; % Number defined in cfg.tfce.th
 clustersize = 8;
 cfg         = vba_tfce_resultsTable(cfg,prefix,clustersize);
 fout        = fullfile(cfg.outDir,sprintf('resultsTable_%s.xlsx',prefix));
