@@ -49,6 +49,10 @@ cfg = default(cfg, 'doLogTrans',0);     % Log-transform imaging data
 % MODEL ESTIMATION
 % =========================================================================
 cfg = default(cfg, 'doRobust',          0);      % Robust regression (fitlm path only)
+
+
+% Commonality analysis
+cfg = default(cfg, 'normValue', 1);              % Whether to renormalise Variance explained relative to a variable of interest (to normalization value)
 cfg = default(cfg, 'estimationMethod',  'QR');   % 'QR' (fast) or 'fitlm' (full)
 
 % Mixed effects specific
@@ -66,6 +70,11 @@ cfg = default(cfg, 'startPerm', 1);     % Starting permutation (resume support)
 % PARALLELISATION
 % =========================================================================
 cfg = default(cfg, 'doRunInSerial', 1); % 0 = parfor, 1 = serial
+
+% =========================================================================
+% WRITING RESULTS
+% =========================================================================
+cfg = default(cfg, 'excludeFromResults',{'(Intercept)','c_'}); % Variables in the model not writing images for
 
 % =========================================================================
 % SLURM / HPC

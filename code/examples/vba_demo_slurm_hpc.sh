@@ -4,12 +4,12 @@
 #SBATCH -p icelake
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --time=00:10:00
+#SBATCH --time=00:20:00
 #SBATCH -J vba_analysis_slurm      # Name of the job
 #SBATCH -o vba_analysis_slurm.out
 #SBATCH -e vba_analysis_slurm.err
 #! set array number
-#SBATCH --array=1-3 # Set to match num_permutations below
+#SBATCH --array=1-2 # Set to match num_permutations below
 
 #! Estimated maximum memory needed (job is force-stopped if exceeded):
 #! RAM is allocated in 3420mb blocks, you are charged per block used,
@@ -27,7 +27,7 @@
 # CONFIGURATION
 # =============================================================================
 
-num_permutations=3     # Must match --array upper bound above
+num_permutations=2     # Must match --array upper bound above
 
 random_seed=12345 # Define a consistent random seed. This is critical to ensure reproducible permutation matrix across nodes/tasks.
 

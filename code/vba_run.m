@@ -116,105 +116,86 @@ idxNumeric      = vartype('numeric');
 % -------------------------
 % Get Variable names
 % -------------------------
-M               = vba_prepare_model(Model);
-VarNames        = M.VarNames;
-ResponseVar     = M.ResponseVar;
-
-% -------------------------
-% '1' in PredictorVars requires estimation of main effect, e.g. do not
-% zscore data
-% --------------------------
-idx1 = ismember(VarNames,'1'); 
-if any(idx1)
-    VarNames(idx1)  = [];
-    doZscore        = 0;
-    modeltype       = 'one-sample'; 
-end
-    
-
-% -------------------------------------------------------------------------
-% Check for covariate variables (starting with 'c_' in equation) whether
-% they have defined with the prefix 'c_' in T table
-% -------------------------------------------------------------------------
-idxCovariate  = contains(VarNames,'c_'); 
-nameCovariate = VarNames(idxCovariate);
-VarNamesTable = T.Properties.VariableNames;
-for ivar = 1:numel(nameCovariate)
-    namecov = nameCovariate{ivar};
-    namecovNoprefix = namecov(3:end);
-    if ~any(ismember(VarNamesTable,namecov)) && any(ismember(VarNamesTable,namecovNoprefix))
-        T.(namecov) = T.(namecovNoprefix);
-    end
-end
-
-%-------------------------------------
-% Identify subjects with missing data
-% -----------------------------------
-idxSub = all(~ismissing(T(:,VarNames)),2);
-tbl    = T(idxSub,VarNames);
-tbl    = T(idxSub,:);
+M               = vba_prepare_model(cfg,T);
+% Unpack everything downstream needs
+tbl           = M.tbl;
+VarNames      = M.VarNames;
+PredictorVars = M.PredictorVars;
+ResponseVar   = M.ResponseVar;
+fixedFormula  = M.fixedFormula;
+mixedFormula  = M.mixedFormula;   % passed to vba_model_fitlme
+randomEffects = M.randomEffects;  % passed into cfg for mixed subfunction
+cfg.colMap    = M.colMap;
+cfg.doZscore  = M.doZscore;     % may have been forced to 0 by main effect
+Model         = M.fixedFormula;
+cfg.model     = Model;
 
 
 %----------------------------
 % Load imaging data 
 % ---------------------------
-% [Y, meta] = vba_load_images(tbl, VarNames, f_mask, cfg);
+[Y, meta] = vba_load_images(tbl, VarNames, cfg);
+
+% Unpack what vba_run needs directly
+Vdv             = meta.Vdv;
+idxMask         = meta.idxMask;
+idxMaskValid    = meta.idxMaskValid;
+VarNamesMaps    = meta.VarNamesMaps;
+VarNamesGlobal  = meta.VarNamesGlobal;
+numVox          = meta.numVox;
+numSub          = meta.numSub;
+
+% Update cfg with resolved sizing
+cfg.numVox      = meta.numVox;
+cfg.numSub      = meta.numSub;
+cfg.idxValidVox = meta.idxValidVox;
+
+
+
+% %----------------------------
+% % Import and apply Brain mask 
+% % ---------------------------
+% Ymask   = logical(spm_read_vols(spm_vol(f_mask)));
+% dimMask = size(Ymask);
+% idxMask = find(Ymask);
 % 
-% % Unpack what vba_run needs directly
-% Vdv             = meta.Vdv;
-% idxMask         = meta.idxMask;
-% idxMaskValid    = meta.idxMaskValid;
-% VarNamesMaps    = meta.VarNamesMaps;
-% VarNamesGlobal  = meta.VarNamesGlobal;
+% % --------------------------------------------------------------
+% % Import Variables/Modalities with Brain images (e.g. RSFA maps
+% % ---------------------------------------------------------------
+% idxMaps         = find(contains(VarNames,'f_'));
+% VarNamesMaps    = VarNames(idxMaps);
+% VarNamesGlobal  = VarNames(~contains(VarNames,'f_'));
 % 
-% % Update cfg with resolved sizing
-% cfg.numVox      = meta.numVox;
-% cfg.idxValidVox = meta.idxValidVox;
-
-%----------------------------
-% Import and apply Brain mask 
-% ---------------------------
-Ymask   = logical(spm_read_vols(spm_vol(f_mask)));
-dimMask = size(Ymask);
-idxMask = find(Ymask);
-
-% --------------------------------------------------------------
-% Import Variables/Modalities with Brain images (e.g. RSFA maps
-% ---------------------------------------------------------------
-idxMaps         = find(contains(VarNames,'f_'));
-VarNamesMaps    = VarNames(idxMaps);
-VarNamesGlobal  = VarNames(~contains(VarNames,'f_'));
-
-numVox   = size(idxMask,1);
-numSub   = size(tbl,1);
-numMap   = numel(idxMaps);
-
-Y = nan(numSub,numVox,numMap);
-
-for iMap = 1:numMap
-    nameMaps = VarNames{idxMaps(iMap)};
-    V   = spm_vol(char(tbl.(nameMaps)));
-    % Check that Mask and this modality dimensions match
-    if ~isequal(dimMask,V(1).dim)
-        strError = sprintf('Error. \nDimensions of Mask and %s do not match.',nameMaps);
-        error(strError);
-    end       
-    y   = spm_read_vols(V);
-    y   = permute(y,[4 1 2 3]);
-    Y(:,:,iMap) = y(:,Ymask);
-    
-    if iMap == 1
-        Vdv = V(1); % Store head of dependent variable modality for later
-    end
-end
-
-% Log-transform imaging data
-% --------------------------
-% N.B. needs further refinement, as it would apply to all modalities (if
-% more than one modality is given).
-if doLogTrans
-    Y = log(Y);
-end
+% numVox   = size(idxMask,1);
+% numSub   = size(tbl,1);
+% numMap   = numel(idxMaps);
+% 
+% Y = nan(numSub,numVox,numMap);
+% 
+% for iMap = 1:numMap
+%     nameMaps = VarNames{idxMaps(iMap)};
+%     V   = spm_vol(char(tbl.(nameMaps)));
+%     % Check that Mask and this modality dimensions match
+%     if ~isequal(dimMask,V(1).dim)
+%         strError = sprintf('Error. \nDimensions of Mask and %s do not match.',nameMaps);
+%         error(strError);
+%     end       
+%     y   = spm_read_vols(V);
+%     y   = permute(y,[4 1 2 3]);
+%     Y(:,:,iMap) = y(:,Ymask);
+% 
+%     if iMap == 1
+%         Vdv = V(1); % Store head of dependent variable modality for later
+%     end
+% end
+% 
+% % Log-transform imaging data
+% % --------------------------
+% % N.B. needs further refinement, as it would apply to all modalities (if
+% % more than one modality is given).
+% if doLogTrans
+%     Y = log(Y);
+% end
 
 tbl_to_save  = tbl;
 
@@ -277,24 +258,26 @@ end
 % Make folders
 % -----------------
 for i=1:numCoef
-%     if ~contains(nameCoef{i},'c_') 
-        outname = regexprep(nameCoef{i},'f_','');
-        
-        % -------------------------------------------------------------------------
-        % Rename interaction terms, so that ':' in interaction terms is replaced 
-        % with 'X'. This is for ':' is invalid character for variable and filenames
-        % -------------------------------------------------------------------------
-        outname = regexprep(outname,':','X');  
+    
+    
+    outname = regexprep(nameCoef{i},'f_','');
+    % -------------------------------------------------------------------------
+    % Rename interaction terms, so that ':' in interaction terms is replaced 
+    % with 'X'. This is for ':' is invalid character for variable and filenames
+    % -------------------------------------------------------------------------
+    outname = regexprep(outname,':','X');  
 
-        % -------------------------------------------------------------------------
-        % Rename squared terms, so that '^' is removed, avoiding invalid character for variable and filenames
-        % -------------------------------------------------------------------------
-        outname = regexprep(outname,'\^','');  
-        
-        nameOutput{i} = outname;
+    % -------------------------------------------------------------------------
+    % Rename squared terms, so that '^' is removed, avoiding invalid character for variable and filenames
+    % -------------------------------------------------------------------------
+    outname = regexprep(outname,'\^','');  
+    nameOutput{i} = outname;
+
+    % Do not create folders for for a pattern specified in excludeFromResult
+    if ~contains(nameCoef{i},cfg.excludeFromResults)
         mkdir(fullfile(outDir,['tval_',outname]));
     %     mkdir(fullfile(outDir,['bval_',nameOutput]));
-%     end
+    end
 end
 
 
@@ -381,12 +364,14 @@ for iperm = startPerm:numPerm
     % For every permutation Write results (tvalCA) to nii images in separate folder,
     % so for 1000 permutations there should be 1000 folders
     % (perm_00001,perm_00002 etc), each one containing the tvalCA maps for
-    % every effect (common and shared) 
+    % every effect (common and shared). perm_00001 is the original
+    % ordering, i.e. real results.
     if isempty(whichRandOrder)
-        vba_write_results(tvals, Vdv, idxMask, nameOutput, outDir, iperm);
+        vba_write_results(cfg, tvals, nameOutput, Vdv, idxMask, iperm);
     else
-        vba_write_results(tvals, Vdv, idxMask, nameOutput, outDir, whichRandOrder);
+        vba_write_results(cfg, tvals, nameOutput, Vdv, idxMask, whichRandOrder);
     end
 end
+
 
 

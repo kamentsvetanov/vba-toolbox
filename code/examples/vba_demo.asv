@@ -20,13 +20,14 @@
 %
 % Specifies analysis to predict T1w intensity values using age and sex as predictors.
 % 
-% VBA can dissociate between brainmaps and univariate variables based on 
-% the prefix 'f_' of the variable in Model, e.g. f_T1w indicates that
-% T.f_T1w contains filepaths to individual's T1-weighted processed images. 
+% IMAGING VARIABLES: VBA can dissociate between brainmaps and univariate 
+% variables based on the prefix 'f_' of the variable in Model, e.g. f_T1w 
+% indicates that T.f_T1w contains filepaths to individual's T1-weighted 
+% processed images. 
 %
-% For large models with many covariates of no interest/confounders, it is 
-% adviseable to indicate these variables with 'c_'. That way VBA will not
-% generate outputs for these variables making it more efficient.
+% COVARIATES - for large models with many covariates of no interest/confounders,
+% it is adviseable to indicate these variables with 'c_'. That way VBA will
+% not generate outputs for these variables making it more efficient.
 %
 % e.g. 
 % Model = 'f_T1w ~ Age + c_Sex'
@@ -38,6 +39,7 @@
 % .../mat/spm12
 % and need to be loaded in Matlab's path
 % 
+
 
 addpath(genpath('/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771'));
 addpath(genpath('/rds/user/kat35/hpc-work/projects/public-code/vba-toolbox/code'));

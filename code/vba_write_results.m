@@ -1,10 +1,13 @@
-function vba_write_results(tvals, Vdv, idxMask, nameOutput, outDir, iperm)
+function vba_write_results(cfg, tvals, nameOutput, Vdv, idxMask, iperm)
 
+% tvals, Vdv, idxMask, nameOutput, outDir, iperm)
+outDir = cfg.outDir;
 
 for i=1:numel(nameOutput)
 %                 % Output coefficients not containing covariates 
 %                 % (i.e. predictors prefixed by 'c_')
-%                 if ~contains(nameCoef{i},'c_') 
+   % Do not create folders for for a pattern specified in excludeFromResult
+    if ~contains(nameOutput{i},cfg.excludeFromResults)
         
         
         Vtemp           = Vdv;
@@ -26,6 +29,6 @@ for i=1:numel(nameOutput)
 %         bmap(idxMask)   = bvals(:,i);  
 %         Vtemp.fname     = fullfile(bdir,sprintf('results_null_%.5d.nii',iperm));
 %         spm_write_vol(Vtemp,bmap);
-%                 end
+    end
   
 end

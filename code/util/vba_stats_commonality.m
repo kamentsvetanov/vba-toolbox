@@ -30,7 +30,7 @@
 % --------------------------------------------------------------
 % Required packages (https://github.com/kamentsvetanov/external)
 % --------------------------------------------------------------
-% kat_import('palm'); https://github.com/andersonwinkler/PALM
+
 
 % Check whether cfg is structure or a linear model
 strClass = class(cfg);
@@ -57,11 +57,12 @@ estimationMethod = cfg.estimationMethod;
 normValue   = cfg.normValue; 
 doPerm      = cfg.doPerm;
 numPerm     = cfg.numPerm; 
-parforArg   = cfg.runParfor;
 
-% Set parforArg to inf if runParfor was 1
-if parforArg == 1
-    parforArg = Inf;
+
+% Set parforArg to inf if not runnign in Serial
+parforArg = Inf;
+if cfg.doRunInSerial % Flag Paraller processing
+    parforArg = 0;
 end
 
 % For standard commonality (i.e. no permuations), reset numPerm to 1 and

@@ -1,0 +1,195 @@
+function varout = vba_prepare_model(Model, tbl, cfg)
+%
+% VBA_PREPARE_MODEL  Parse Wilkinson formula and prepare analysis table.
+%
+% Handles standard GLM formulas and extended mixed effects formulas.
+% For mixed models, parses both fixed and random effects components,
+% validates grouping variables, and prepares the full model specification
+% so vba_run and estimation subfunctions receive a clean, unambiguous
+% model description.
+%
+% It also, extends model parsing to inspect variable types in tbl and
+% dummy-code any categorical variables once, returning a fully
+% numeric table ready for QR estimation and commonality analysis.
+%
+% INPUTS
+%   Model - Wilkinson model string. Two formats accepted:
+%
+%           GLM (linear/commonality):
+%             'f_rsfa ~ age + sex'
+%
+%           Mixed effects ? random effects appended in parentheses:
+%             'f_rsfa ~ age + sex + (1|SubjectID)'
+%             'f_rsfa ~ age + time + (1 + time|SubjectID)'
+%             'f_rsfa ~ age + time + (1|SubjectID) + (1|Site)'
+%
+%   tbl   - Subject table (optional). If provided:
+%             - categorical variables are dummy-coded
+%             - grouping variables are validated
+%             - random effect levels are counted and reported
+%
+%   cfg   - Config struct (optional). Uses cfg.modelType to determine
+%           whether to expect random effects syntax.
+%
+% OUTPUTS
+%   varout.ResponseVar       - Cell, response variable name
+%   varout.PredictorVars     - Cell, fixed effect predictor names (no random)
+%   varout.VarNames          - Cell, all variable names (expanded for dummies)
+%   varout.f_model           - String, sanitised model name for filenames
+%   varout.moderation        - Struct, interaction terms if present
+%   varout.fixedFormula      - String, fixed effects only formula for fitlm
+%   varout.mixedFormula      - String, full formula for fitlme (if mixed)
+%   varout.randomEffects     - Struct array, one per random effects term:
+%                                .formula    '(1 + time|SubjectID)'
+%                                .slopes     {'time'} or {} for intercept only
+%                                .groupVar   'SubjectID'
+%                                .numGroups  number of unique levels (if tbl given)
+%                                .intercept  logical, random intercept included
+%   varout.tbl               - Table, categoricals dummy-coded (if tbl given)
+%   varout.colMap            - containers.Map, varname->column indices
+%   varout.dummyInfo         - Struct array, dummy coding reference
+%
+% Author : Kamen Tsvetanov, Ph.D.
+%__________________________________________________________________________
+
+if nargin < 2, tbl = [];  end
+if nargin < 3, cfg = [];  end
+
+modelType = '';
+if ~isempty(cfg) && isfield(cfg,'modelType')
+    modelType = cfg.modelType;
+end
+function varout = vba_prepare_model(Model, T, cfg)
+% ... (existing header) ...
+
+% =========================================================================
+% STEP 1 - Split fixed and random effects  (unchanged)
+% =========================================================================
+[fixedFormula, randomEffects] = parseRandomEffects(Model);
+
+% =========================================================================
+% STEP 2 - Parse fixed effects formula  (unchanged)
+% =========================================================================
+VarNames      = strtrim(split(fixedFormula, ["~","*","+","^",":"]));
+VarNames      = VarNames(~cellfun(@isempty, VarNames));
+ResponseVar   = VarNames(1);
+PredictorVars = VarNames(2:end);
+
+% =========================================================================
+% STEP 3 - Handle intercept-only / main effect model
+% '1' as sole predictor means one-sample t-test; suppress z-scoring
+% =========================================================================
+isMainEffect = any(strcmp(PredictorVars, '1'));
+doZscore     = cfg.doZscore;   % may be overridden below
+
+if isMainEffect
+    PredictorVars = PredictorVars(~strcmp(PredictorVars, '1'));
+    VarNames      = VarNames(~strcmp(VarNames, '1'));
+    doZscore      = 0;
+    fprintf('  Main effect model detected: z-scoring disabled\n');
+end
+
+% =========================================================================
+% STEP 4 - Resolve covariate prefix 'c_' in T
+%
+% Variables named 'c_xxx' in the model mark covariates of no interest
+% (excluded from output maps). If T does not contain 'c_xxx' as a column
+% but does contain 'xxx', create 'c_xxx' as an alias so downstream
+% code can find it by its prefixed name.
+% =========================================================================
+idxCovariate  = contains(VarNames, 'c_');
+nameCovariate = VarNames(idxCovariate);
+VarNamesTable = T.Properties.VariableNames;
+
+for ivar = 1:numel(nameCovariate)
+    namecov         = nameCovariate{ivar};
+    namecovNoPrefix = namecov(3:end);                      % strip 'c_'
+
+    hasPrefix   = any(ismember(VarNamesTable, namecov));
+    hasNoPrefix = any(ismember(VarNamesTable, namecovNoPrefix));
+
+    if ~hasPrefix && hasNoPrefix
+        % Alias: add prefixed column pointing to existing data
+        T.(namecov) = T.(namecovNoPrefix);
+        fprintf('  Covariate alias: ''%s'' -> ''%s''\n', namecov, namecovNoPrefix);
+    elseif ~hasPrefix && ~hasNoPrefix
+        error(['vba_prepare_model: covariate ''%s'' (or ''%s'') not found in T.\n' ...
+               'Available variables: %s'], ...
+               namecov, namecovNoPrefix, strjoin(VarNamesTable, ', '));
+    end
+end
+
+% =========================================================================
+% STEP 5 - Filter subjects with missing data
+%
+% Only check missingness for non-imaging variables here ? imaging
+% variables (f_ prefix) are checked per-voxel in vba_load_images
+% via the valid-voxel mask. Including f_ columns here would require
+% loading all images just to filter subjects, which is premature.
+% =========================================================================
+VarNamesNonImaging = VarNames(~contains(VarNames, 'f_'));
+
+if ~isempty(VarNamesNonImaging)
+    % Keep only columns that exist in T (imaging cols may not yet)
+    VarNamesCheck = VarNamesNonImaging(ismember(VarNamesNonImaging, VarNamesTable));
+    idxSub        = all(~ismissing(T(:, VarNamesCheck)), 2);
+else
+    idxSub        = true(height(T), 1);
+end
+
+numExcluded = sum(~idxSub);
+if numExcluded > 0
+    fprintf('  Excluded %d subject(s) with missing non-imaging data\n', numExcluded);
+end
+
+tbl = T(idxSub, :);   % full row subset, all columns retained
+
+% =========================================================================
+% STEP 6 - Validate random effects against tbl  (unchanged)
+% =========================================================================
+if ~isempty(randomEffects) && ~isempty(tbl)
+    randomEffects = validateRandomEffects(randomEffects, tbl);
+end
+
+% =========================================================================
+% STEP 7 - Dummy code categoricals in tbl  (unchanged)
+% =========================================================================
+% fixedFormula  - for fitlm or the QR path (no random effects)
+% mixedFormula  - for fitlme (fixed + random)
+[tbl, colMap, dummyInfo, PredictorVars, VarNames] = ...
+    dummyCodeTable(tbl, PredictorVars, VarNames);
+
+% =========================================================================
+% STEP 8 - Reconstruct formulas  (unchanged)
+% =========================================================================
+fixedFormulaClean = rebuildFixedFormula(ResponseVar{1}, PredictorVars, isMainEffect);
+
+if ~isempty(randomEffects)
+    reParts      = {randomEffects.formula};
+    mixedFormula = [fixedFormulaClean ' + ' strjoin(reParts, ' + ')];
+else
+    mixedFormula = fixedFormulaClean;
+end
+
+% =========================================================================
+% Assemble output
+% =========================================================================
+varout.ResponseVar      = ResponseVar;
+varout.PredictorVars    = PredictorVars;
+varout.VarNames         = VarNames;
+varout.f_model          = sanitiseModelName(fixedFormula);
+varout.isMainEffect     = isMainEffect;
+varout.doZscore         = doZscore;        % may differ from cfg.doZscore
+varout.fixedFormula     = fixedFormulaClean;
+varout.mixedFormula     = mixedFormula;
+varout.randomEffects    = randomEffects;
+varout.tbl              = tbl;
+varout.colMap           = colMap;
+varout.dummyInfo        = dummyInfo;
+varout.idxSub           = idxSub;          % logical index into original T
+
+
+% Print summary
+printSummary(varout, cfg.modelType);
+
+end

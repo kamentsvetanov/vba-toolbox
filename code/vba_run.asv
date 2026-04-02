@@ -77,16 +77,30 @@ function [cfg,outDir] = vba_run(T,cfg)
 % try specificSeed    = cfg.specificSeed;     catch specificSeed    = []; end % (SLURM option) provide specificSeed to reproduce permuted Matrix across workers/nodes
 % try doLogTrans      = cfg.doLogTrans;       catch doLogTrans    = 0;    end % Whether or not to log-transform neuroimaging data
 
-
-
+% -------------------------------------------------------------------------
+% 1. Validate and fill defaults ? single source of truth
 cfg = vba_cfg(cfg);   % populate defaults and validate
 
+% -------------------------------------------------------------------------
+% 2. Unpack for readability and parfor safety
+% Scalars and strings only ? large arrays stay in cfg
+% and are passed explicitly to subfunctions that need them
+rootDir          = cfg.rootDir;
+doZscore         = cfg.doZscore;
+doLogTrans       = cfg.doLogTrans;
+doRobust         = cfg.doRobust;
+doRunInSerial    = cfg.doRunInSerial;
+numPerm          = cfg.numPerm;
+startPerm        = cfg.startPerm;
+Model            = cfg.model;
+modelType        = cfg.modelType;% This can be 'linear', 'mixed' or 'commonality' or 'maineffect'
+specificSeed     = cfg.specificSeed;
+whichRandOrder   = cfg.whichRandOrder;
+f_mask           = cfg.f_mask;
 
 
 
-modelType = cfg.modelType;% This can be 'linear', 'mixed' or 'commonality' or 'maineffect'
-
-
+% -------------------------------------------------------------------------
 % Set parforArg to inf (Default), assuming CA is run in matlab with parfor.
 % Otherwise set to 0 (see example with SLURM implementation below)
 parforArg = Inf;
@@ -95,112 +109,93 @@ if doRunInSerial % Flag Paraller processing
 end
 
 
-modeltype       = 'regression'; % 'one-sample' also possible if 'y~1'
+% modeltype       = 'regression'; % 'one-sample' also possible if 'y~1'
 idxNumeric      = vartype('numeric'); 
-idxCategorical  = vartype('categorical'); 
+% idxCategorical  = vartype('categorical'); 
 
 % -------------------------
 % Get Variable names
 % -------------------------
-M               = vba_prepare_model(Model);
-VarNames        = M.VarNames;
-ResponseVar     = M.ResponseVar;
-
-% -------------------------
-% '1' in PredictorVars requires estimation of main effect, e.g. do not
-% zscore data
-% --------------------------
-idx1 = ismember(VarNames,'1'); 
-if any(idx1)
-    VarNames(idx1)  = [];
-    doZscore        = 0;
-    modeltype       = 'one-sample'; 
-end
-    
-
-% -------------------------------------------------------------------------
-% Check for covariate variables (starting with 'c_' in equation) whether
-% they have defined with the prefix 'c_' in T table
-% -------------------------------------------------------------------------
-idxCovariate  = contains(VarNames,'c_'); 
-nameCovariate = VarNames(idxCovariate);
-VarNamesTable = T.Properties.VariableNames;
-for ivar = 1:numel(nameCovariate)
-    namecov = nameCovariate{ivar};
-    namecovNoprefix = namecov(3:end);
-    if ~any(ismember(VarNamesTable,namecov)) && any(ismember(VarNamesTable,namecovNoprefix))
-        T.(namecov) = T.(namecovNoprefix);
-    end
-end
-
-%-------------------------------------
-% Identify subjects with missing data
-% -----------------------------------
-idxSub = all(~ismissing(T(:,VarNames)),2);
-tbl    = T(idxSub,VarNames);
-tbl    = T(idxSub,:);
+M               = vba_prepare_model(cfg,T);
+% Unpack everything downstream needs
+tbl           = M.tbl;
+VarNames      = M.VarNames;
+PredictorVars = M.PredictorVars;
+ResponseVar   = M.ResponseVar;
+fixedFormula  = M.fixedFormula;
+mixedFormula  = M.mixedFormula;   % passed to vba_model_fitlme
+randomEffects = M.randomEffects;  % passed into cfg for mixed subfunction
+cfg.colMap    = M.colMap;
+cfg.doZscore  = M.doZscore;     % may have been forced to 0 by main effect
+Model         = M.fixedFormula;
+cfg.model     = Model;
 
 
 %----------------------------
 % Load imaging data 
 % ---------------------------
-% [Y, meta] = vba_load_images(tbl, VarNames, f_mask, cfg);
+[Y, meta] = vba_load_images(tbl, VarNames, cfg);
+
+% Unpack what vba_run needs directly
+Vdv             = meta.Vdv;
+idxMask         = meta.idxMask;
+idxMaskValid    = meta.idxMaskValid;
+VarNamesMaps    = meta.VarNamesMaps;
+VarNamesGlobal  = meta.VarNamesGlobal;
+numVox          = meta.numVox;
+numSub          = meta.numSub;
+
+% Update cfg with resolved sizing
+cfg.numVox      = meta.numVox;
+cfg.numSub      = meta.numSub;
+cfg.idxValidVox = meta.idxValidVox;
+
+
+
+% %----------------------------
+% % Import and apply Brain mask 
+% % ---------------------------
+% Ymask   = logical(spm_read_vols(spm_vol(f_mask)));
+% dimMask = size(Ymask);
+% idxMask = find(Ymask);
 % 
-% % Unpack what vba_run needs directly
-% Vdv             = meta.Vdv;
-% idxMask         = meta.idxMask;
-% idxMaskValid    = meta.idxMaskValid;
-% VarNamesMaps    = meta.VarNamesMaps;
-% VarNamesGlobal  = meta.VarNamesGlobal;
+% % --------------------------------------------------------------
+% % Import Variables/Modalities with Brain images (e.g. RSFA maps
+% % ---------------------------------------------------------------
+% idxMaps         = find(contains(VarNames,'f_'));
+% VarNamesMaps    = VarNames(idxMaps);
+% VarNamesGlobal  = VarNames(~contains(VarNames,'f_'));
 % 
-% % Update cfg with resolved sizing
-% cfg.numVox      = meta.numVox;
-% cfg.idxValidVox = meta.idxValidVox;
-
-%----------------------------
-% Import and apply Brain mask 
-% ---------------------------
-Ymask   = logical(spm_read_vols(spm_vol(f_mask)));
-dimMask = size(Ymask);
-idxMask = find(Ymask);
-
-% --------------------------------------------------------------
-% Import Variables/Modalities with Brain images (e.g. RSFA maps
-% ---------------------------------------------------------------
-idxMaps         = find(contains(VarNames,'f_'));
-VarNamesMaps    = VarNames(idxMaps);
-VarNamesGlobal  = VarNames(~contains(VarNames,'f_'));
-
-numVox   = size(idxMask,1);
-numSub   = size(tbl,1);
-numMap   = numel(idxMaps);
-
-Y = nan(numSub,numVox,numMap);
-
-for iMap = 1:numMap
-    nameMaps = VarNames{idxMaps(iMap)};
-    V   = spm_vol(char(tbl.(nameMaps)));
-    % Check that Mask and this modality dimensions match
-    if ~isequal(dimMask,V(1).dim)
-        strError = sprintf('Error. \nDimensions of Mask and %s do not match.',nameMaps);
-        error(strError);
-    end       
-    y   = spm_read_vols(V);
-    y   = permute(y,[4 1 2 3]);
-    Y(:,:,iMap) = y(:,Ymask);
-    
-    if iMap == 1
-        Vdv = V(1); % Store head of dependent variable modality for later
-    end
-end
-
-% Log-transform imaging data
-% --------------------------
-% N.B. needs further refinement, as it would apply to all modalities (if
-% more than one modality is given).
-if doLogTrans
-    Y = log(Y);
-end
+% numVox   = size(idxMask,1);
+% numSub   = size(tbl,1);
+% numMap   = numel(idxMaps);
+% 
+% Y = nan(numSub,numVox,numMap);
+% 
+% for iMap = 1:numMap
+%     nameMaps = VarNames{idxMaps(iMap)};
+%     V   = spm_vol(char(tbl.(nameMaps)));
+%     % Check that Mask and this modality dimensions match
+%     if ~isequal(dimMask,V(1).dim)
+%         strError = sprintf('Error. \nDimensions of Mask and %s do not match.',nameMaps);
+%         error(strError);
+%     end       
+%     y   = spm_read_vols(V);
+%     y   = permute(y,[4 1 2 3]);
+%     Y(:,:,iMap) = y(:,Ymask);
+% 
+%     if iMap == 1
+%         Vdv = V(1); % Store head of dependent variable modality for later
+%     end
+% end
+% 
+% % Log-transform imaging data
+% % --------------------------
+% % N.B. needs further refinement, as it would apply to all modalities (if
+% % more than one modality is given).
+% if doLogTrans
+%     Y = log(Y);
+% end
 
 tbl_to_save  = tbl;
 
@@ -263,7 +258,8 @@ end
 % Make folders
 % -----------------
 for i=1:numCoef
-%     if ~contains(nameCoef{i},'c_') 
+    % Do not create folderrs for intercept and covariates
+    if ~contains(nameCoef{i},{'c_','(Intercept)'})
         outname = regexprep(nameCoef{i},'f_','');
         
         % -------------------------------------------------------------------------
@@ -280,7 +276,7 @@ for i=1:numCoef
         nameOutput{i} = outname;
         mkdir(fullfile(outDir,['tval_',outname]));
     %     mkdir(fullfile(outDir,['bval_',nameOutput]));
-%     end
+    end
 end
 
 

@@ -1,8 +1,6 @@
-Number of permutations: 3
+Number of permutations: 2
 Model:                  f_rsfa ~ age + sex
-Number of permutations: 3
-Number of permutations: 3
-Model:                  f_rsfa ~ age + sex
+Number of permutations: 2
 Model:                  f_rsfa ~ age + sex
 
                             < M A T L A B (R) >
@@ -10,26 +8,6 @@ Model:                  f_rsfa ~ age + sex
                   R2019a (9.6.0.1072779) 64-bit (glnxa64)
                                March 8, 2019
 
-
-                            < M A T L A B (R) >
-                  Copyright 1984-2019 The MathWorks, Inc.
-                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
-                               March 8, 2019
-
-
-                            < M A T L A B (R) >
-                  Copyright 1984-2019 The MathWorks, Inc.
-                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
-                               March 8, 2019
-
- 
-To get started, type doc.
-For product information, visit www.mathworks.com.
- 
- 
-To get started, type doc.
-For product information, visit www.mathworks.com.
- 
  
 To get started, type doc.
 For product information, visit www.mathworks.com.
@@ -78,188 +56,6 @@ rename the function to avoid a potential name conflict.]
 you rename the function to avoid a potential name conflict.] 
 [> In path (line 109)
   In addpath (line 86)] 
-     2
-
-
-num_perm =
-
-     3
-
-
-specific_seed =
-
-       12345
-
-
-Model =
-
-    'f_rsfa ~ age + sex'
-
-
-f_mask =
-
-    '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-
-[Warning: Function iscolumn has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function ismatrix has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isrow has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function narginchk has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isequaln has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function contains has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function endsWith has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function newline has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function startsWith has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isfile has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isfolder has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-     1
-
-
-num_perm =
-
-     3
-
-
-specific_seed =
-
-       12345
-
-
-Model =
-
-    'f_rsfa ~ age + sex'
-
-
-f_mask =
-
-    '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-
-[Warning: Removing
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
-from your path.
-See
-http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
-[Warning:
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
-not found in path.] 
-[> In rmpath (line 71)
-  In isrow (line 35)
-  In rmfield (line 34)
-  In table/getPropertyNamesList (line 448)
-  In readtable (line 216)
-  In vba_run_slurm (line 71)] 
-[Warning: Removing
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
-from your path.
-See
-http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
-[Warning:
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
-not found in path.] 
-[> In rmpath (line 71)
-  In isrow (line 35)
-  In rmfield (line 34)
-  In table/getPropertyNamesList (line 448)
-  In readtable (line 216)
-  In vba_run_slurm (line 71)] 
-[Warning: Function iscolumn has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function ismatrix has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isrow has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function narginchk has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isequaln has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function contains has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function endsWith has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function newline has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function startsWith has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isfile has the same name as a MATLAB builtin. We suggest you
-rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-[Warning: Function isfolder has the same name as a MATLAB builtin. We suggest
-you rename the function to avoid a potential name conflict.] 
-[> In path (line 109)
-  In addpath (line 86)] 
-     3
-
-
-num_perm =
-
-     3
-
-
-specific_seed =
-
-       12345
-
-
-Model =
-
-    'f_rsfa ~ age + sex'
-
-
-f_mask =
-
-    '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-
 [Warning: Removing
 "/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
 from your path.
@@ -313,12 +109,92 @@ cfg =
              model: 'f_rsfa ~ age + sex'
            rootDir: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/'
             f_mask: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-           numPerm: 3
+           numPerm: 2
     whichRandOrder: 2
       specificSeed: 12345
            doSlurm: 1
-         modelType: 'linear'
+         modelType: 'commonality'
 
+  Dummy-coded 'sex': ref='M', 2 levels -> 1 columns
+
+--- Model specification ---
+  Fixed formula : f_rsfa ~ age + sex_F
+  Response      : f_rsfa
+  Predictors    : age, sex_F
+  Model type    : commonality
+---------------------------
+
+Loading brain mask: /rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii
+  Mask contains 23595 voxels
+Loading modality 1/1: f_rsfa
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
+                               March 8, 2019
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+[Warning: Function iscolumn has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function ismatrix has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function isrow has the same name as a MATLAB builtin. We suggest you
+rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function narginchk has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function isequaln has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function contains has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function endsWith has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function newline has the same name as a MATLAB builtin. We suggest you
+rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function startsWith has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function isfile has the same name as a MATLAB builtin. We suggest you
+rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Function isfolder has the same name as a MATLAB builtin. We suggest
+you rename the function to avoid a potential name conflict.] 
+[> In path (line 109)
+  In addpath (line 86)] 
+[Warning: Removing
+"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
+from your path.
+See
+http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
+[Warning:
+"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2010b"
+not found in path.] 
+[> In rmpath (line 71)
+  In isrow (line 35)
+  In rmfield (line 34)
+  In table/getPropertyNamesList (line 448)
+  In readtable (line 216)
+  In vba_run_slurm (line 71)] 
 [Warning: Removing
 "/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2016b"
 from your path.
@@ -358,72 +234,47 @@ cfg =
              model: 'f_rsfa ~ age + sex'
            rootDir: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/'
             f_mask: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-           numPerm: 3
+           numPerm: 2
     whichRandOrder: 1
       specificSeed: 12345
            doSlurm: 1
-         modelType: 'linear'
+         modelType: 'commonality'
 
-[Warning: Removing
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2016b"
-from your path.
-See
-http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
-[Warning: Removing
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2017b"
-from your path.
-See
-http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
-[Warning: The DATETIME data was created using format 'MM/dd/uuuu HH:mm' but also
-matched 'dd/MM/uuuu HH:mm'.
-To avoid ambiguity, use a format character vector. e.g. '%{MM/dd/uuuu HH:mm}D'] 
-[> In table/readTextFile>textscanReadData (line 562)
-  In table/readTextFile (line 233)
-  In table.readFromFile (line 44)
-  In readtable (line 216)
-  In vba_run_slurm (line 71)] 
-[Warning: The DATETIME data was created using format 'MM/dd/uuuu HH:mm' but also
-matched 'dd/MM/uuuu HH:mm'.
-To avoid ambiguity, use a format character vector. e.g. '%{MM/dd/uuuu HH:mm}D'] 
-[> In table/readTextFile>textscanReadData (line 562)
-  In table/readTextFile (line 233)
-  In table.readFromFile (line 44)
-  In readtable (line 216)
-  In vba_run_slurm (line 71)] 
-[Warning: Removing
-"/rds/user/kat35/hpc-work/projects/external/mat/spm12_7771/external/fieldtrip/compat/matlablt2012a"
-from your path.
-See
-http://www.fieldtriptoolbox.org/faq/should_i_add_fieldtrip_with_all_subdirectories_to_my_matlab_path/] 
+  Dummy-coded 'sex': ref='M', 2 levels -> 1 columns
 
-cfg = 
+--- Model specification ---
+  Fixed formula : f_rsfa ~ age + sex_F
+  Response      : f_rsfa
+  Predictors    : age, sex_F
+  Model type    : commonality
+---------------------------
 
-  struct with fields:
-
-             model: 'f_rsfa ~ age + sex'
-           rootDir: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/'
-            f_mask: '/rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii'
-           numPerm: 3
-    whichRandOrder: 3
-      specificSeed: 12345
-           doSlurm: 1
-         modelType: 'linear'
-
+Loading brain mask: /rds/project/rds-tbdABxTZvic/users/kat35/vba_test/data/mask.nii
+  Mask contains 23595 voxels
+Loading modality 1/1: f_rsfa
+  Valid voxels after NaN filtering: 23595 / 23595 (100.0%)
+  Valid voxels after NaN filtering: 23595 / 23595 (100.0%)
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
 [Warning: Directory already exists.] 
-[> In vba_run (line 295)
-  In vba_run_slurm (line 89)] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
+[Warning: Directory already exists.] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 
+[Warning: Directory already exists.] 
+[> In vba_run (line 276)
+  In vba_run_slurm (line 90)] 

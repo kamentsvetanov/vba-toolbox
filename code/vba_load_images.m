@@ -39,6 +39,7 @@ function [Y, meta] = vba_load_images(tbl, VarNames, cfg)
 % Parse config
 % -------------------------
 try doLogTrans = cfg.doLogTrans; catch, doLogTrans = 0; end % Whether or not to log-transform neuroimaging data
+f_mask = cfg.f_mask;
 
 % -----------------------------------------------
 % Identify imaging vs global variable names
@@ -115,4 +116,41 @@ if doLogTrans
 end
 
 % -----------------------------------------------
-% V
+% Valid-voxel masking
+% Remove voxels where any subject has NaN in any modality
+% -----------------------------------------------
+% validVoxMask: 1 x numVoxMask logical
+%   all(.,1) collapses over subjects ? 1 x numVoxMask x numMap
+%   all(.,3) collapses over maps     ? 1 x numVoxMask
+validVoxMask = squeeze(all(all(~isnan(Y_full), 1), 3));  % [numVoxMask x 1]
+
+idxValidVox  = find(validVoxMask);
+numVox       = numel(idxValidVox);
+
+% Composed index: maps valid voxels directly into 3D brain volume
+idxMaskValid = idxMask(idxValidVox);
+
+fprintf('  Valid voxels after NaN filtering: %d / %d (%.1f%%)\n', ...
+    numVox, numVoxMask, 100 * numVox / numVoxMask);
+
+if numVox == 0
+    error('vba_load_images: No valid voxels remain after NaN filtering. Check image coverage and mask.');
+end
+
+% Restrict Y to valid voxels
+Y = Y_full(:, idxValidVox, :);   % [numSub x numVox x numMap]
+
+% -----------------------------------------------
+% Assemble metadata output struct
+% -----------------------------------------------
+meta.Ymask          = Ymask;
+meta.dimMask        = dimMask;
+meta.idxMask        = idxMask;
+meta.idxValidVox    = idxValidVox;
+meta.idxMaskValid   = idxMaskValid;
+meta.numVox         = numVox;
+meta.numSub         = numSub;
+meta.numMap         = numMap;
+meta.VarNamesMaps   = VarNamesMaps;
+meta.VarNamesGlobal = VarNamesGlobal;
+meta.Vdv            = Vdv;

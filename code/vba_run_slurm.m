@@ -62,11 +62,11 @@ function vba_run_slurm(f_data, Model,modelType, rootDir,num_perm, specific_seed,
 
 % permMatrix = readmatrix(f_permMatrix);
 % permMatrix = permMatrix';
-disp(column_index);
-num_perm
-specific_seed
-Model
-f_mask
+% disp(column_index);
+% num_perm
+% specific_seed
+% Model
+% f_mask
 
 T = readtable(f_data);
 
@@ -85,6 +85,7 @@ cfg.whichRandOrder  = column_index;
 cfg.specificSeed    = specific_seed;
 cfg.doSlurm         = 1;
 cfg.modelType       = modelType;% 'commonality' 'linear' 'mixed' 'maineffect' 
+% cfg.estimationMethod= 'fitlm';
 cfg
 cfg                 = vba_run(T,cfg);
 
