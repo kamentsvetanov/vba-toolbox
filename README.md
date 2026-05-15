@@ -1,6 +1,6 @@
 ## Voxel-Based Analysis Toolbox: GLM, Mixed-Effects, and Commonality Analysis for Neuroimaging
 
-A flexible MATLAB toolbox for voxel-wise statistical analysis, supporting GLM, mixed-effects models, and commonality analysis across multi-modal brain images.
+A flexible MATLAB toolbox for [voxel-wise statistical analysis](https://github.com/kamentsvetanov/vba-toolbox), supporting GLM, mixed-effects models, and commonality analysis across multi-modal brain images.
 
 ### Background
 
